@@ -1,0 +1,127 @@
+body {
+    background: #1a1a1a;
+    color: white;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+    margin-bottom: 30px;
+}
+
+video {
+    width: 100%;
+    max-width: 800px;
+    height: 450px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #333;
+}
+
+.controls, .speed-controls {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.speed-controls {
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #555;
+}
+
+.speed-controls label {
+    color: #00ff00;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+input[type="file"] {
+    margin: 10px;
+    padding: 8px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+button {
+    background: #00ff00;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 0 5px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #00cc00;
+}
+
+button.active {
+    background: #ffff00;
+    color: black;
+}
+
+.alerts-panel {
+    margin-top: 20px;
+    background: #000;
+    border: 2px solid #ff0000;
+    border-radius: 8px;
+    padding: 20px;
+    height: 200px;
+    overflow-y: auto;
+}
+
+.alert-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: slideIn 0.5s ease forwards;
+}
+
+.alert-suspicious {
+    background: rgba(255, 165, 0, 0.2);
+    border-left: 4px solid #ffa500;
+    color: #ffa500;
+}
+
+.alert-security {
+    background: rgba(255, 0, 0, 0.2);
+    border-left: 4px solid #ff0000;
+    color: #ff0000;
+}
+
+.timestamp {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-right: 10px;
+}
+
+.status {
+    text-align: center;
+    color: #00ff00;
+    margin: 10px 0;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
