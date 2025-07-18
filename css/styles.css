@@ -95,6 +95,12 @@ button.active {
     animation: slideIn 0.5s ease forwards;
 }
 
+.alert-clear {
+    background: rgba(0, 255, 0, 0.2);
+    border-left: 4px solid #00ff00;
+    color: #00ff00;
+}
+
 .alert-suspicious {
     background: rgba(255, 165, 0, 0.2);
     border-left: 4px solid #ffa500;

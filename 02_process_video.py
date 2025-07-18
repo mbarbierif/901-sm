@@ -12,7 +12,16 @@ def detect_interactions(people_boxes, vehicle_boxes, threshold=50):
             vx1, vy1, vx2, vy2 = vehicle
             # Check if person and vehicle are close (overlapping or nearby)
             if not (x2 < vx1 - threshold or x1 > vx2 + threshold or y2 < vy1 - threshold or y1 > vy2 + threshold):
-                interactions.append(f"Person {i+1} near Vehicle {j+1}")
+                interactions.append(f"Person {i+1} near Vehicle {j+1}!!!")
+    
+    for i, person_1 in enumerate(people_boxes):
+        for j, person_2 in enumerate(people_boxes):
+            if i!=j:
+                x1, y1, x2, y2 = person_1
+                vx1, vy1, vx2, vy2 = person_2
+                # Check if person_1 and person_2 are close (overlapping or nearby)
+                if not (x2 < vx1 - threshold or x1 > vx2 + threshold or y2 < vy1 - threshold or y1 > vy2 + threshold):
+                    interactions.append(f"Person {i+1} near Person {j+1}!!!")
     return interactions
 
 video_path, people_count, vehicle_count = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
@@ -50,12 +59,24 @@ while True:
             "people_boxes": people_boxes,
             "vehicle_boxes": vehicle_boxes
         })
+
+        if len(people_boxes) == people_count:
+            if people_count == 1:
+                alerts.append({"timestamp": timestamp, "alert": f"All Clear: There is 1 person in the footage."})
+            else:
+                alerts.append({"timestamp": timestamp, "alert": f"All Clear: There are {len(people_boxes)} people in the footage."})
         
         if len(people_boxes) > people_count:
-            alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There are {len(people_boxes)} suspects in the footage!"})
+            if len(people_boxes) - people_count == 1:
+                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There is 1 suspect in the footage!"})
+            else:
+                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There are {len(people_boxes) - people_count} suspects in the footage!"})
         
         if len(vehicle_boxes) > vehicle_count:
-            alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There are {len(vehicle_boxes)} suspicious vehicles in the footage!"})
+            if len(vehicle_boxes) - vehicle_count == 1:
+                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There is 1 suspicious vehicle in the footage!"})
+            else:
+                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There are {len(vehicle_boxes) - vehicle_count} suspicious vehicles in the footage!"})
         
         interactions = detect_interactions(people_boxes, vehicle_boxes)
         for interaction in interactions:

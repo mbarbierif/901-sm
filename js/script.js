@@ -30,13 +30,25 @@ function loadFiles() {
         alertsPanel.style.display = 'block';
         status.textContent = `Loaded ${alerts.length} alerts - Ready for monitoring`;
         setupAlertSync();
-        setSpeed(1); // Set default speed and highlight button
+        
+        // Set default speed after video is loaded
+        videoPlayer.addEventListener('loadedmetadata', function() {
+            setSpeed(1);
+        }, { once: true });
     };
     reader.readAsText(alertsFile);
 }
 
 function setSpeed(speed) {
-    videoPlayer.playbackRate = speed;
+    if (videoPlayer.readyState >= 1) {
+        // Video metadata is loaded, can set playback rate immediately
+        videoPlayer.playbackRate = speed;
+    } else {
+        // Wait for metadata to load before setting playback rate
+        videoPlayer.addEventListener('loadedmetadata', function() {
+            videoPlayer.playbackRate = speed;
+        }, { once: true });
+    }
     
     // Update button states
     const buttons = document.querySelectorAll('.speed-controls button');
@@ -90,6 +102,8 @@ function showAlert(alert) {
         alertDiv.classList.add('alert-suspicious');
     } else if (alert.alert.includes('Security Alert')) {
         alertDiv.classList.add('alert-security');
+    } else if (alert.alert.includes('All Clear')) {
+        alertDiv.classList.add('alert-clear');
     }
     
     const timestamp = formatTime(alert.timestamp);
