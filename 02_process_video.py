@@ -12,7 +12,7 @@ def detect_interactions(people_boxes, vehicle_boxes, threshold=50):
             vx1, vy1, vx2, vy2 = vehicle
             # Check if person and vehicle are close (overlapping or nearby)
             if not (x2 < vx1 - threshold or x1 > vx2 + threshold or y2 < vy1 - threshold or y1 > vy2 + threshold):
-                interactions.append(f"Person {i+1} near Vehicle {j+1}!!!")
+                interactions.append(f"Persona {i+1} cerca del Vehículo {j+1}!!!")
     
     for i, person_1 in enumerate(people_boxes):
         for j, person_2 in enumerate(people_boxes):
@@ -21,15 +21,16 @@ def detect_interactions(people_boxes, vehicle_boxes, threshold=50):
                 vx1, vy1, vx2, vy2 = person_2
                 # Check if person_1 and person_2 are close (overlapping or nearby)
                 if not (x2 < vx1 - threshold or x1 > vx2 + threshold or y2 < vy1 - threshold or y1 > vy2 + threshold):
-                    interactions.append(f"Person {i+1} near Person {j+1}!!!")
+                    interactions.append(f"Persona {i+1} cerca de la Persona {j+1}!!!")
     return interactions
 
-video_path, people_count, vehicle_count = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
+video_id, people_count, vehicle_count = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 skip_frames = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+Path("annotations").mkdir(exist_ok=True)
 Path("processed").mkdir(exist_ok=True)
 
 model = YOLO("yolov8s.pt")
-cap = cv2.VideoCapture(video_path)
+cap = cv2.VideoCapture(f"downloads/{video_id}.webm")
 fps = cap.get(cv2.CAP_PROP_FPS)
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -48,8 +49,8 @@ while True:
         results = model(frame)
         timestamp = frame_num / fps
         
-        people_boxes = [box.xyxy[0].tolist() for box in results[0].boxes if box.cls == 0]  # person class
-        vehicle_boxes = [box.xyxy[0].tolist() for box in results[0].boxes if box.cls in [2, 3, 5, 7]]  # car, motorcycle, bus, truck
+        people_boxes = [box.xyxy[0].tolist() for box in results[0].boxes if box.cls == 0]  # Clase Persona
+        vehicle_boxes = [box.xyxy[0].tolist() for box in results[0].boxes if box.cls in [2, 3, 5, 7]]  # Auto, Moto, Bus, Camión
         
         annotations.append({
             "frame": frame_num,
@@ -61,44 +62,35 @@ while True:
         })
 
         if len(people_boxes) == people_count:
-            if people_count == 1:
-                alerts.append({"timestamp": timestamp, "alert": f"All Clear: There is 1 person in the footage."})
-            else:
-                alerts.append({"timestamp": timestamp, "alert": f"All Clear: There are {len(people_boxes)} people in the footage."})
+            alerts.append({"timestamp": timestamp, "alert": "Todo OK"})
         
         if len(people_boxes) > people_count:
-            if len(people_boxes) - people_count == 1:
-                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There is 1 suspect in the footage!"})
-            else:
-                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There are {len(people_boxes) - people_count} suspects in the footage!"})
+            alerts.append({"timestamp": timestamp, "alert": "Actividad Sospechosa"})
+
         
         if len(vehicle_boxes) > vehicle_count:
-            if len(vehicle_boxes) - vehicle_count == 1:
-                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There is 1 suspicious vehicle in the footage!"})
-            else:
-                alerts.append({"timestamp": timestamp, "alert": f"Suspicious Activity: There are {len(vehicle_boxes) - vehicle_count} suspicious vehicles in the footage!"})
+            alerts.append({"timestamp": timestamp, "alert": "Actividad Sospechosa"})
         
         interactions = detect_interactions(people_boxes, vehicle_boxes)
         for interaction in interactions:
-            alerts.append({"timestamp": timestamp, "alert": f"Security Alert: {interaction}"})
+            alerts.append({"timestamp": timestamp, "alert": "¡Alerta de Seguridad!"})
     
     frame_num += 1
 
-print()  # New line when done
+
 cap.release()
 
-base_name = Path(video_path).stem
-with open(f"processed/{base_name}_annotations.json", "w") as f:
+with open(f"annotations/{video_id}_annotations.json", "w") as f:
     json.dump(annotations, f, indent=2)
-with open(f"processed/{base_name}_alerts.json", "w") as f:
+with open(f"processed/{video_id}_alerts.json", "w") as f:
     json.dump(alerts, f, indent=2)
 
 """
 Examples:
-uv run python 02_process_video.py "downloads/1gi5qn1khVk_15.webm" 1 0 5
-uv run python 02_process_video.py "downloads/IDN4S-mhplk_21.webm" 0 0 5
-uv run python 02_process_video.py "downloads/KTDen9ooazo_22.webm" 2 0 5
-uv run python 02_process_video.py "downloads/ms-Q3t5IqNM_12.webm" 0 1 5
-uv run python 02_process_video.py "downloads/p_sOLAtXY44_28.webm" 0 1 5
-uv run python 02_process_video.py "downloads/V3QMrftx3cQ_32.webm" 0 0 5
+uv run python 02_process_video.py "KTDen9ooazo" 2 0
+uv run python 02_process_video.py "1gi5qn1khVk" 1 0
+uv run python 02_process_video.py "IDN4S-mhplk" 0 0
+uv run python 02_process_video.py "ms-Q3t5IqNM" 0 1
+uv run python 02_process_video.py "p_sOLAtXY44" 0 1
+uv run python 02_process_video.py "V3QMrftx3cQ" 0 0
 """

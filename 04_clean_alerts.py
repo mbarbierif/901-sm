@@ -1,47 +1,80 @@
 import sys
 import json
+from collections import defaultdict
+
+def get_alert_priority(alert_text):
+    """Retorna nivel de prioridad: A mayor número mayor prioridad"""
+    if "¡Alerta de Seguridad!" in alert_text:
+        return 3
+    elif "Actividad Sospechosa" in alert_text:
+        return 2
+    elif "Todo OK" in alert_text:
+        return 1
+    else:
+        return 0
+
+def group_and_prioritize_alerts(alerts):
+    """Agrupa las alertas generadas en cada segundo y deja sólo la que tenga mayor prioridad"""
+    grouped = defaultdict(list)
+    
+    for alert in alerts:
+        second = int(alert["timestamp"])
+        grouped[second].append(alert)
+    
+    prioritized = []
+    for second in sorted(grouped.keys()):
+        alerts_in_second = grouped[second]
+        highest_priority_alert = max(alerts_in_second, key=lambda x: get_alert_priority(x["alert"]))
+        prioritized.append(highest_priority_alert)
+    
+    return prioritized
 
 def clean_repeated_alerts(alerts):
+    """Elimina alertas duplicadas consecutivas"""
     if not alerts:
         return alerts
     
-    cleaned = [alerts[0]]  # Keep the first alert
+    cleaned = [alerts[0]]  # Guardar primera alerta
     
     for current_alert in alerts[1:]:
         last_alert = cleaned[-1]
         
-        # Keep alert if it's different from the previous one
+        # Mantener alerta si es distinta de la anterior
         if current_alert["alert"] != last_alert["alert"]:
             cleaned.append(current_alert)
     
     return cleaned
 
-alerts_file_path = sys.argv[1]
+video_id = sys.argv[1]
 
-# Load alerts
-with open(alerts_file_path, "r") as f:
+# Cargar alertas
+with open(f"processed/{video_id}_alerts.json", "r") as f:
     alerts = json.load(f)
 
-print(f"Original alerts: {len(alerts)}")
+print(f"Alertas originales: {len(alerts)}")
 
-# Clean repeated alerts
-cleaned_alerts = clean_repeated_alerts(alerts)
+# Paso 1: Agrupar por segundo y priorizar
+prioritized_alerts = group_and_prioritize_alerts(alerts)
+print(f"Luego de priorizar por segundo: {len(prioritized_alerts)}")
 
-print(f"Cleaned alerts: {len(cleaned_alerts)}")
-print(f"Removed {len(alerts) - len(cleaned_alerts)} repeated alerts")
+# Paso 2: Eliminar repetidas
+cleaned_alerts = clean_repeated_alerts(prioritized_alerts)
+print(f"Luego de eliminar repeticiones: {len(cleaned_alerts)}")
+
+print(f"Total de eliminadas: {len(alerts) - len(cleaned_alerts)} alertas")
 
 # Save back to the same file
-with open(alerts_file_path, "w") as f:
+with open(f"processed/{video_id}_alerts.json", "w") as f:
     json.dump(cleaned_alerts, f, indent=2)
 
-print(f"Alerts cleaned and saved to {alerts_file_path}")
+print(f"Alertas limpias y guardadas en processed/{video_id}_alerts.json")
 
 """
 Examples:
-uv run python 04_clean_alerts.py "processed/1gi5qn1khVk_15_alerts.json"
-uv run python 04_clean_alerts.py "processed/IDN4S-mhplk_21_alerts.json"
-uv run python 04_clean_alerts.py "processed/KTDen9ooazo_22_alerts.json"
-uv run python 04_clean_alerts.py "processed/ms-Q3t5IqNM_12_alerts.json"
-uv run python 04_clean_alerts.py "processed/p_sOLAtXY44_28_alerts.json"
-uv run python 04_clean_alerts.py "processed/V3QMrftx3cQ_32_alerts.json"
+uv run python 04_clean_alerts.py "KTDen9ooazo"
+uv run python 04_clean_alerts.py "1gi5qn1khVk"
+uv run python 04_clean_alerts.py "IDN4S-mhplk"
+uv run python 04_clean_alerts.py "ms-Q3t5IqNM"
+uv run python 04_clean_alerts.py "p_sOLAtXY44"
+uv run python 04_clean_alerts.py "V3QMrftx3cQ"
 """

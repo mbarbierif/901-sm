@@ -10,7 +10,7 @@ function loadFiles() {
     const alertsFile = document.getElementById('alertsFile').files[0];
     
     if (!videoFile || !alertsFile) {
-        alert('Please select both video and alerts files');
+        alert('Por favor seleccione un archivo de video y uno de alertas');
         return;
     }
     
@@ -28,7 +28,7 @@ function loadFiles() {
     reader.onload = function(e) {
         alerts = JSON.parse(e.target.result);
         alertsPanel.style.display = 'block';
-        status.textContent = `Loaded ${alerts.length} alerts - Ready for monitoring`;
+        status.textContent = `Se han cargado ${alerts.length} alertas - Listo para monitorear`;
         setupAlertSync();
         
         // Set default speed after video is loaded
@@ -98,11 +98,11 @@ function showAlert(alert) {
     alertDiv.className = 'alert-item';
     
     // Determine alert type for styling
-    if (alert.alert.includes('Suspicious Activity')) {
+    if (alert.alert.includes('Actividad Sospechosa')) {
         alertDiv.classList.add('alert-suspicious');
-    } else if (alert.alert.includes('Security Alert')) {
+    } else if (alert.alert.includes('¡Alerta de Seguridad!')) {
         alertDiv.classList.add('alert-security');
-    } else if (alert.alert.includes('All Clear')) {
+    } else if (alert.alert.includes('Todo OK')) {
         alertDiv.classList.add('alert-clear');
     }
     

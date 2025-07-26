@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Alert System</title>
+    <title>901 Seguridad Monitoreada</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>🔒 SECURITY ALERT SYSTEM 🔒</h1>
+        <h1>🔒 901 SEGURIDAD MONITOREADA 🔒</h1>
         
         <div class="controls">
-            <input type="file" id="videoFile" accept=".webm,.mp4" placeholder="Select annotated video">
-            <input type="file" id="alertsFile" accept=".json" placeholder="Select alerts JSON">
-            <button onclick="loadFiles()">Load & Start Monitoring</button>
+            <input type="file" id="videoFile" accept=".webm,.mp4" placeholder="Seleccionar video anotado">
+            <input type="file" id="alertsFile" accept=".json" placeholder="Seleccionar JSON de alertas">
+            <button onclick="loadFiles()">Cargar & Monitorear</button>
         </div>
         
         <div class="speed-controls" id="speedControls" style="display: none;">
-            <label>Playback Speed:</label>
+            <label>Velocidad de Reproducción:</label>
             <button onclick="setSpeed(0.25)">0.25x</button>
             <button onclick="setSpeed(0.5)">0.5x</button>
             <button onclick="setSpeed(0.75)">0.75x</button>
             <button onclick="setSpeed(1)">1x</button>
         </div>
         
-        <div class="status" id="status">Please select video and alerts files</div>
+        <div class="status" id="status">Por favor seleccionar archivo de video y de alertas</div>
         
         <video id="videoPlayer" controls style="display: none;">
-            Your browser does not support the video tag.
+            Su navegador no soporta el tag de video.
         </video>
         
         <div class="alerts-panel" id="alertsPanel" style="display: none;">
-            <h3 style="margin-top: 0; color: #ff0000;">🚨 LIVE SECURITY ALERTS</h3>
+            <h3 style="margin-top: 0; color: #ff0000;">🚨 ALERTAS DE SEGURIDAD EN VIVO</h3>
             <div id="alertsList"></div>
         </div>
     </div>
